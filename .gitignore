@@ -1,0 +1,5 @@
+**.cc.cyclo
+**.cc.o
+**.cc.d
+**.cc.su
+UART_Receive_Transmit_Console_A7*
