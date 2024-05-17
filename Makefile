@@ -1,4 +1,4 @@
-CROSS 		:= /home/nihao/tool/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.linux64_1.0.100.202403111256/tools/bin/arm-none-eabi-
+CROSS 		:= toolchain/bin/arm-none-eabi-
 CC   		:=  $(CROSS)gcc
 CXX   		:=  $(CROSS)g++
 DEBUG   	:=  
@@ -50,20 +50,24 @@ CFLAGS  	+=  --specs=nano.specs -mfpu=vfpv4-d16 -mfloat-abi=hard -mthumb
 
 CXXFLAGS  	+=  -Wall
 LDFLAGS	    +=  -mcpu=cortex-a7 -T"Drivers/CMSIS/Device/ST/STM32MP13xx/Source/Templates/gcc/linker/stm32mp13xx_a7_ddr.ld" 
-LDFLAGS	    +=  --specs=nosys.specs -Wl,-Map="UART_Receive_Transmit_Console_A7.map" 
+LDFLAGS	    +=  --specs=nosys.specs -Wl,-Map="blink.map" 
 LDFLAGS	    +=  -Wl,--gc-sections -static --specs=nano.specs -mfpu=vfpv4-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 
-UART_Receive_Transmit_Console_A7.hex:UART_Receive_Transmit_Console_A7.elf
-	$(CROSS)size  UART_Receive_Transmit_Console_A7.elf 
-	$(CROSS)objdump -h -S UART_Receive_Transmit_Console_A7.elf  > "UART_Receive_Transmit_Console_A7.list"
-	$(CROSS)objcopy  -O ihex UART_Receive_Transmit_Console_A7.elf  UART_Receive_Transmit_Console_A7.hex
-	$(CROSS)objcopy -O binary UART_Receive_Transmit_Console_A7.elf UART_Receive_Transmit_Console_A7.bin
+
+mini_sdraw.bin: blink.stm32
+	dd if=/dev/zero of=mini_sdraw.bin bs=1M count=1
+	dd if=blink.stm32 of=mini_sdraw.bin bs=1K seek=64
+
+
+blink.stm32:blink.elf
+	$(CROSS)size  blink.elf 
+	Utilities/ImageHeader/postbuild_STM32MP13.sh toolchain/bin blink
 
 
 #links
-UART_Receive_Transmit_Console_A7.elf:$(OBJ)
+blink.elf:$(OBJ)
 	@mkdir -p output
-	$(CC) $(OBJ) $(LIB_PATH) $(LIB_NAMES) -o UART_Receive_Transmit_Console_A7.elf $(LDFLAGS)
+	$(CC) $(OBJ) $(LIB_PATH) $(LIB_NAMES) -o blink.elf $(LDFLAGS)
  
 #compile
 %.cc.o: %.c
@@ -84,5 +88,6 @@ clean:
 	@echo "Remove linked and compiled files......"
 	rm -rf $(OBJ) $(TARGET) output 
 	rm -rf $(CLEANOBJ)
-	rm -rf UART_Receive_Transmit_Console_A7.*
+	rm -rf blink*
+	rm -rf mini_sdraw.bin
 

@@ -1,9 +1,10 @@
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
-  * @file    main.c
+  * @file    GPIO/GPIO_EXTI/Src/main.c
   * @author  MCD Application Team
-  * @brief   Main program body
+  * @brief   This example describes how to configure and use GPIOs through
+  *          the STM32MP13xx HAL API.
   ******************************************************************************
   * @attention
   *
@@ -20,10 +21,12 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include <stdio.h>
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+/* Private includes ----------------------------------------------------------*/
+/* USER CODE BEGIN Includes */
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -42,32 +45,16 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
-UART_HandleTypeDef huart4;
-
 /* USER CODE BEGIN PV */
+EXTI_HandleTypeDef hexti;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
-static void MX_GPIO_Init(void);
-static void MX_UART4_Init(void);
-
 /* USER CODE BEGIN PFP */
-#ifdef __GNUC__
-/* With GCC, small printf (option LD Linker->Libraries->Small printf
-   set to 'Yes') calls __io_putchar() */
-#define PUTCHAR_PROTOTYPE int __io_putchar(int ch)
-#else
-#define PUTCHAR_PROTOTYPE int fputc(int ch, FILE *f)
-#endif /* __GNUC__ */
-
-#ifdef __GNUC__
-#define GETCHAR_PROTOTYPE int __io_getchar (void)
-#else
-#define GETCHAR_PROTOTYPE int fgetc(FILE * f)
-#endif /* __GNUC__ */
-
-void Test_Validation_Menu(void);
+/* Private function prototypes -----------------------------------------------*/
+static void EXTI14_IRQHandler_Config(void);
+static void Exti14FallingCb(void);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -77,14 +64,11 @@ void Test_Validation_Menu(void);
 
 /**
   * @brief  The application entry point.
-  *
-  * @retval None
+  * @retval int
   */
 int main(void)
 {
-
   /* USER CODE BEGIN 1 */
-	 char name[5] = "START";
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -93,6 +77,7 @@ int main(void)
   HAL_Init();
 
   /* USER CODE BEGIN Init */
+
   /* Configure the system clock */
   SystemClock_Config();
  
@@ -110,48 +95,45 @@ int main(void)
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
-
-  MX_GPIO_Init();
-  MX_UART4_Init();
-
   /* USER CODE BEGIN 2 */
   /* Initialize the IO expander */
-  BSP_IOEXPANDER_Init(0, IOEXPANDER_IO_MODE);
+//  BSP_IOEXPANDER_Init(0, IOEXPANDER_IO_MODE);
 
-  /* Configure LED_GREEN */
-  BSP_LED_Init(LED_GREEN);
 
-  /* Output a message on Hyperterminal using printf function */
-  printf("\n\r*********************************************");
-  printf("\n\r** Start UART Receive and Transmit Example **");
-  printf("\n\r*********************************************\n\r");
-  printf("\n\r");
-  printf("\n\r    ** Retarget the C library 'printf' function to the UART\n\r");
-  printf("\n\r        >> Printf = Test finished successfully. ** \n\r");
 
-  printf("\n\r    ** Press c to continue with 'getchar' test !!! \r\n");
-  while (name[0] != 'c')
-  {
-    Serial_Scanf(name, 1);
-    if (name[0] != 'c')
-      {
-      printf("\n\r !!! Invalid Character, please press c to continue the test !!! \r\n");
-      }
-  }
+  GPIO_InitTypeDef   GPIO_InitStruct;
 
-  Test_Validation_Menu();
+  /* Enable GPIOA clock */
+  __HAL_RCC_GPIOC_CLK_ENABLE();
 
-  BSP_LED_On(LED_GREEN);
-  printf("\n\r");
-  printf("\n\r********************************************");
-  printf("\n\r** Stop UART Receive and Transmit Example **");
-  printf("\n\r********************************************\n\r");
+  /* Configure PA.14 pin as input floating */
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Pin = GPIO_PIN_13;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+
+
+
+
+
+
+  /* -1- Initialize LEDs mounted on STM32MP135C-DK board */
+//  BSP_LED_Init(LED_GREEN);
+
+  /* -2- Configure EXTI14 (connected to PA.14 pin) in interrupt mode */
+//  EXTI14_IRQHandler_Config();
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+	  HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
+
+	  HAL_Delay(1000);
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -286,214 +268,62 @@ void SystemClock_Config(void)
 
 }
 
-/**
-  * @brief UART4 Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_UART4_Init(void)
-{
-
-  /* USER CODE BEGIN UART4_Init 0 */
-
-  /* USER CODE END UART4_Init 0 */
-
-  /* USER CODE BEGIN UART4_Init 1 */
-
-  /* USER CODE END UART4_Init 1 */
-
-  huart4.Instance = UART4;
-  huart4.Init.BaudRate = 115200;
-  huart4.Init.WordLength = UART_WORDLENGTH_8B;
-  huart4.Init.StopBits = UART_STOPBITS_1;
-  huart4.Init.Parity = UART_PARITY_NONE;
-  huart4.Init.Mode = UART_MODE_TX_RX;
-  huart4.Init.HwFlowCtl = UART_HWCONTROL_NONE;
-  huart4.Init.OverSampling = UART_OVERSAMPLING_8;
-  huart4.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
-  huart4.Init.ClockPrescaler = UART_PRESCALER_DIV1;
-  huart4.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
-
-  if (HAL_UART_Init(&huart4) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  if (HAL_UARTEx_SetTxFifoThreshold(&huart4, UART_TXFIFO_THRESHOLD_1_8) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  if (HAL_UARTEx_SetRxFifoThreshold(&huart4, UART_RXFIFO_THRESHOLD_1_8) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  if (HAL_UARTEx_DisableFifoMode(&huart4) != HAL_OK)
-  {
-    Error_Handler();
-  }
-
-  /* USER CODE BEGIN UART4_Init 2 */
-
-  /* USER CODE END UART4_Init 2 */
-}
-
-/**
-  * @brief GPIO Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_GPIO_Init(void)
-{
-
-  /* GPIO Ports Clock Enable */
-  __HAL_RCC_GPIOD_CLK_ENABLE();
-
-}
-
 /* USER CODE BEGIN 4 */
-
-int Serial_Scanf(char *ptr, int len)
-{
-
-  int DataIdx = 0;
-  uint8_t thechar;
-  thechar= ' ';
-  while(thechar!= '\n' && thechar != '\r' && DataIdx<len)
-  {
-#ifdef __GNUC__
-    thechar = __io_getchar();
-
-#else
-    thechar = fgetc(NULL);
-#endif
-  if ( thechar  >= 0xFF)
-  {
-    printf("\n\r  !!! Please enter a valid ASCII character \n");
-    return 0xFF;
-  }
-  *ptr++ =thechar;
-  DataIdx+=1;
-  }
-  return DataIdx;
-}
 /**
-  * @brief  Retargets the C library printf function to the USART.
+  * @brief  Configures EXTI line 14 (connected to PA.14 pin) in interrupt mode
   * @param  None
   * @retval None
   */
-
-int __write(int file, char *buf, int size)
+static void EXTI14_IRQHandler_Config(void)
 {
-  (void)file;
-  (void)size;
-  HAL_UART_Transmit(&huart4, (uint8_t *)buf, 1, 0xFFFF);
-  return 1;
+  GPIO_InitTypeDef   GPIO_InitStruct;
+  EXTI_ConfigTypeDef EXTI_ConfigStructure;
+
+  /* Enable GPIOA clock */
+  __HAL_RCC_GPIOA_CLK_ENABLE();
+
+  /* Configure PA.14 pin as input floating */
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Pin = USER_BUTTON_PIN;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+  /* Set configuration except Interrupt and Event mask of Exti line 14*/
+  EXTI_ConfigStructure.Line = EXTI_LINE_14;
+  EXTI_ConfigStructure.Trigger = EXTI_TRIGGER_FALLING;
+  EXTI_ConfigStructure.GPIOSel = EXTI_GPIOA;
+  EXTI_ConfigStructure.Mode = EXTI_MODE_INTERRUPT;
+  HAL_EXTI_SetConfigLine(&hexti, &EXTI_ConfigStructure);
+
+  /* Register callback to treat Exti interrupts in user Exti14FallingCb function */
+  HAL_EXTI_RegisterCallback(&hexti, HAL_EXTI_FALLING_CB_ID, Exti14FallingCb);
+
+  /* Enable and set line 14 Interrupt to the lowest priority */
+  IRQ_SetPriority(EXTI14_IRQn, 0);
+  IRQ_Enable(EXTI14_IRQn);
 }
 
-PUTCHAR_PROTOTYPE
+/**
+  * @brief EXTI line detection callbacks
+  * @param None:
+  * @retval None
+  */
+static void Exti14FallingCb(void)
 {
-  /* Place your implementation of fputc here */
-  /* e.g. write a character to the UART4 and Loop until the end of transmission */
-  __write(1, (char *)&ch, 1);
-  return ch;
-}
-
-
-GETCHAR_PROTOTYPE
-{
-  uint8_t ch = 0;
-  /* Clear the Overrun flag just before receiving the first character */
-  __HAL_UART_CLEAR_OREFLAG(&huart4);
-
-  HAL_UART_Receive(&huart4, (uint8_t *)&ch, 1, 0xFFFF);
-  HAL_UART_Transmit(&huart4, (uint8_t *)&ch, 1, 0xFFFF);
-  return ch;
-}
-
-void Test_Validation_Menu(void)
-{
-  int menu_option = 0;
-  uint8_t stop_test = 0;
-
-  char menu_select[5];
-  char menu1[] ="Test1";
-  char menu2[] ="Test2";
-  char menu3[] ="Test3";
-  char menu_init[] ="MENU0";
-  uint8_t duration = 0;
-
-  do
-  {
-    printf("\r\n        Select the test options:\r\n");
-    printf("\r\n          Test1: Fast Toggle LED");
-    printf("\r\n          Test2: Slow Toggle LED");
-    printf("\r\n          Test3: Exit \r\n");
-    strcpy(menu_select, menu_init);
-    menu_option=0;
-    duration=0;
-
-      menu_option = Serial_Scanf(menu_select,5);
-
-/* CASE 'Test1' selected */
-    if(strncmp(menu_select, menu1, menu_option) == 0)
-    {
-        printf("\r\n                ** Start Fast Toggle Test : see LED_GREEN!\r\n");
-        while(duration < 50)
-        {
-          /* Toggle LED_GREEN for error */
-          BSP_LED_Toggle(LED_GREEN);
-          HAL_Delay(100);
-          duration++;
-        }
-        printf("\r\n                ** Fast Toggle Test is Finished!\r\n");
-
-    }
-
-/* CASE 'Test2' selected */
-    else if(strncmp(menu_select, menu2, menu_option) == 0)
-    {
-        printf("\r\n                ** Start Slow Toggle Test : see LED_GREEN!\r\n");
-        while(duration < 10)
-        {
-          /* Toggle LED_GREEN for error */
-          BSP_LED_Toggle(LED_GREEN);
-          HAL_Delay(500);
-          duration++;
-        }
-        printf("\r\n                ** Slow Toggle Test is Finished!\r\n");
-    }
-
-/* CASE 'Exit' selected */
-    else if(strncmp(menu_select, menu3, menu_option) == 0)
-    {
-        printf("\n\r  >> Getchar = Test finished successfully. ** \n\r");
-        stop_test=1;
-    }
-
-/* CASE wrong selection */
-    else
-    {
-        printf("\r\n                !! INVALID CHOICE\r\n");
-    }
-
-  } while (stop_test != 1);
+  BSP_LED_Toggle(LED_GREEN);
 }
 /* USER CODE END 4 */
 
 /**
   * @brief  This function is executed in case of error occurrence.
-  * @param  file: The file name as string.
-  * @param  line: The line in file as a number.
   * @retval None
   */
 void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
   /* User can add his own implementation to report the HAL error return state */
-  while(1)
+  while(1) 
   {
-    /* Toggle LED_GREEN for error */
-    BSP_LED_Toggle(LED_GREEN);
-    HAL_Delay(1000);
   }
   /* USER CODE END Error_Handler_Debug */
 }
@@ -506,20 +336,17 @@ void Error_Handler(void)
   * @param  line: assert_param error line source number
   * @retval None
   */
-void assert_failed(uint8_t* file, uint32_t line)
-{
+void assert_failed(uint8_t *file, uint32_t line)
+{ 
   /* USER CODE BEGIN 6 */
   /* User can add his own implementation to report the file name and line number,
-     ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
+    ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
+
+ /* Infinite loop */
+  while (1)
+  {
+  }
   /* USER CODE END 6 */
 }
 #endif /* USE_FULL_ASSERT */
-
-/**
-  * @}
-  */
-
-/**
-  * @}
-  */
 

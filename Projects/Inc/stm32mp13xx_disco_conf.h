@@ -31,7 +31,7 @@
 #define USE_BSP_CRITICAL_SECTION            0U
 
 /* Activation of PMIC */
-#define USE_STPMIC1x                        1U
+#define USE_STPMIC1x                        0U
 
 /* Usage of COM feature */
 #define USE_BSP_COM_FEATURE                 0U
