@@ -27,7 +27,8 @@ CSOURCES   	+= /home/nihao/work/github/STM32CubeMP13/Drivers/STM32MP13xx_HAL_Dri
 			   Drivers/BSP/STM32MP13xx_DISCO/stm32mp13xx_disco_io.c \
 			   Drivers/BSP/STM32MP13xx_DISCO/stm32mp13xx_disco_stpmic1.c \
 			   Drivers/BSP/Components/mcp23x17/mcp23x17.c \
-			   Drivers/BSP/Components/mcp23x17/mcp23x17_reg.c
+			   Drivers/BSP/Components/mcp23x17/mcp23x17_reg.c\
+			   Drivers/CMSIS/Device/ST/STM32MP13xx/Source/Templates/gcc/startup_stm32mp135c_ca7.c
 
 
 
@@ -48,20 +49,21 @@ CFLAGS  	+=  --specs=nano.specs -mfpu=vfpv4-d16 -mfloat-abi=hard -mthumb
 
 
 CXXFLAGS  	+=  -Wall
-LDFLAGS	    +=  -mcpu=cortex-a7 -T"/home/nihao/work/github/STM32CubeMP13/Projects/STM32MP135C-DK/Examples/UART/UART_Receive_Transmit_Console/STM32CubeIDE/stm32mp13xx_a7_sysram.ld" 
+LDFLAGS	    +=  -mcpu=cortex-a7 -T"Drivers/CMSIS/Device/ST/STM32MP13xx/Source/Templates/gcc/linker/stm32mp13xx_a7_ddr.ld" 
 LDFLAGS	    +=  --specs=nosys.specs -Wl,-Map="UART_Receive_Transmit_Console_A7.map" 
 LDFLAGS	    +=  -Wl,--gc-sections -static --specs=nano.specs -mfpu=vfpv4-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 
 UART_Receive_Transmit_Console_A7.hex:UART_Receive_Transmit_Console_A7.elf
 	$(CROSS)size  UART_Receive_Transmit_Console_A7.elf 
 	$(CROSS)objdump -h -S UART_Receive_Transmit_Console_A7.elf  > "UART_Receive_Transmit_Console_A7.list"
-	$(CROSS)objcopy  -O ihex UART_Receive_Transmit_Console_A7.elf  "UART_Receive_Transmit_Console_A7.hex"
+	$(CROSS)objcopy  -O ihex UART_Receive_Transmit_Console_A7.elf  UART_Receive_Transmit_Console_A7.hex
+	$(CROSS)objcopy -O binary UART_Receive_Transmit_Console_A7.elf UART_Receive_Transmit_Console_A7.bin
 
 
 #links
 UART_Receive_Transmit_Console_A7.elf:$(OBJ)
 	@mkdir -p output
-	$(CXX) $(OBJ) $(LIB_PATH) $(LIB_NAMES) -o UART_Receive_Transmit_Console_A7.elf $(LDFLAGS)
+	$(CC) $(OBJ) $(LIB_PATH) $(LIB_NAMES) -o UART_Receive_Transmit_Console_A7.elf $(LDFLAGS)
  
 #compile
 %.cc.o: %.c
