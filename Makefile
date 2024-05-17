@@ -7,7 +7,7 @@ CSRCPATH	:= Projects/Src
 CXXSRCPATH	?= 
 CSOURCES   	+= $(foreach dir, $(CSRCPATH), $(wildcard $(dir)/*.c))
 CXXSOURCES	+= $(foreach dir, $(CXXSRCPATH), $(wildcard $(dir)/*.cpp))
-CSOURCES   	+= /home/nihao/work/github/STM32CubeMP13/Drivers/STM32MP13xx_HAL_Driver/Src/stm32mp13xx_hal.c \
+CSOURCES   	+= Drivers/STM32MP13xx_HAL_Driver/Src/stm32mp13xx_hal.c \
 			   Drivers/STM32MP13xx_HAL_Driver/Src/stm32mp13xx_hal_dma.c \
 			   Drivers/STM32MP13xx_HAL_Driver/Src/stm32mp13xx_hal_dma_ex.c \
 			   Drivers/STM32MP13xx_HAL_Driver/Src/stm32mp13xx_hal_exti.c \
