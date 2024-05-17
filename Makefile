@@ -7,29 +7,27 @@ CSRCPATH	:= Projects/Src
 CXXSRCPATH	?= 
 CSOURCES   	+= $(foreach dir, $(CSRCPATH), $(wildcard $(dir)/*.c))
 CXXSOURCES	+= $(foreach dir, $(CXXSRCPATH), $(wildcard $(dir)/*.cpp))
-CSOURCES   	+= Drivers/STM32MP13xx_HAL_Driver/Src/stm32mp13xx_hal.c \
-			   Drivers/STM32MP13xx_HAL_Driver/Src/stm32mp13xx_hal_dma.c \
-			   Drivers/STM32MP13xx_HAL_Driver/Src/stm32mp13xx_hal_dma_ex.c \
-			   Drivers/STM32MP13xx_HAL_Driver/Src/stm32mp13xx_hal_exti.c \
-			   Drivers/STM32MP13xx_HAL_Driver/Src/stm32mp13xx_hal_gpio.c \
-			   Drivers/STM32MP13xx_HAL_Driver/Src/stm32mp13xx_hal_i2c.c \
-			   Drivers/STM32MP13xx_HAL_Driver/Src/stm32mp13xx_hal_pwr.c \
-			   Drivers/STM32MP13xx_HAL_Driver/Src/stm32mp13xx_hal_pwr_ex.c \
-			   Drivers/STM32MP13xx_HAL_Driver/Src/stm32mp13xx_hal_rcc.c \
-			   Drivers/STM32MP13xx_HAL_Driver/Src/stm32mp13xx_hal_rcc_ex.c \
-			   Drivers/STM32MP13xx_HAL_Driver/Src/stm32mp13xx_hal_uart.c \
-			   Drivers/STM32MP13xx_HAL_Driver/Src/stm32mp13xx_hal_uart_ex.c \
-			   Drivers/CMSIS/Core_A/Source/irq_ctrl_gic.c \
-			   Drivers/CMSIS/Device/ST/STM32MP13xx/Source/Templates/mmu_stm32mp13xx.c \
-			   Drivers/CMSIS/Device/ST/STM32MP13xx/Source/Templates/system_stm32mp13xx_A7.c \
-			   Drivers/BSP/STM32MP13xx_DISCO/stm32mp13xx_disco.c \
-			   Drivers/BSP/STM32MP13xx_DISCO/stm32mp13xx_disco_bus.c \
-			   Drivers/BSP/STM32MP13xx_DISCO/stm32mp13xx_disco_io.c \
-			   Drivers/BSP/STM32MP13xx_DISCO/stm32mp13xx_disco_stpmic1.c \
-			   Drivers/BSP/Components/mcp23x17/mcp23x17.c \
-			   Drivers/BSP/Components/mcp23x17/mcp23x17_reg.c\
-			   Drivers/CMSIS/Device/ST/STM32MP13xx/Source/Templates/gcc/startup_stm32mp135c_ca7.c
-
+CSOURCES   	+= Drivers/CMSIS/Device/ST/STM32MP13xx/Source/Templates/gcc/startup_stm32mp135c_ca7.c						\
+			Drivers/STM32MP13xx_HAL_Driver/Src/stm32mp13xx_hal.c													\
+			Drivers/STM32MP13xx_HAL_Driver/Src/stm32mp13xx_hal_dma.c												\
+			Drivers/STM32MP13xx_HAL_Driver/Src/stm32mp13xx_hal_dma_ex.c												\
+			Drivers/STM32MP13xx_HAL_Driver/Src/stm32mp13xx_hal_exti.c												\
+			Drivers/STM32MP13xx_HAL_Driver/Src/stm32mp13xx_hal_gpio.c												\
+			Drivers/STM32MP13xx_HAL_Driver/Src/stm32mp13xx_hal_i2c.c												\
+			Drivers/STM32MP13xx_HAL_Driver/Src/stm32mp13xx_hal_pwr.c												\
+			Drivers/STM32MP13xx_HAL_Driver/Src/stm32mp13xx_hal_pwr_ex.c												\
+			Drivers/STM32MP13xx_HAL_Driver/Src/stm32mp13xx_hal_rcc.c												\
+			Drivers/STM32MP13xx_HAL_Driver/Src/stm32mp13xx_hal_rcc_ex.c												\
+			Drivers/CMSIS/Core_A/Source/irq_ctrl_gic.c																\
+			Drivers/CMSIS/Device/ST/STM32MP13xx/Source/Templates/mmu_stm32mp13xx.c									\
+			Drivers/CMSIS/Device/ST/STM32MP13xx/Source/Templates/system_stm32mp13xx_A7.c							\
+			Drivers/BSP/STM32MP13xx_DISCO/stm32mp13xx_disco.c														\
+			Drivers/BSP/STM32MP13xx_DISCO/stm32mp13xx_disco_bus.c													\
+			Drivers/BSP/STM32MP13xx_DISCO/stm32mp13xx_disco_io.c													\
+			Drivers/BSP/STM32MP13xx_DISCO/stm32mp13xx_disco_stpmic1.c												\
+			Drivers/BSP/Components/mcp23x17/mcp23x17.c																\
+			Drivers/BSP/Components/mcp23x17/mcp23x17_reg.c															
+			   
 
 
 INCLUDES   	+=   -IProjects/Src -IProjects/Inc  -IDrivers/CMSIS/Core_A/Include -IDrivers/CMSIS/Device/ST/STM32MP13xx/Include 
@@ -41,15 +39,15 @@ LIB_NAMES  	+=
 LIB_PATH  	+=  -L./lib
 OBJ   		+=  $(patsubst %.c, %.cc.o, $(CSOURCES))
 OBJ   		+=  $(patsubst %.cpp, %.cxx.o, $(CXXSOURCES))
-CFLAGS  	+=  -mcpu=cortex-a7 -std=gnu11 -g3  
-CFLAGS  	+=  -DSTM32MP135Fxx -D__LOG_TRACE_IO_ -DMCP_IOEXPANDER -DUSE_STM32MP13XX_DK -DCORE_CA7 -DCACHE_USE -DMMU_USE -DUSE_HAL_DRIVER -DUSE_FULL_ASSERT 
-CFLAGS  	+=  -ffunction-sections -Wall -Wno-strict-aliasing -fstack-usage -fcyclomatic-complexity -MMD -MP 
+CFLAGS  	+=  -mcpu=cortex-a7 -std=gnu11 -g3 
+CFLAGS  	+=  -DSTM32MP135Fxx -DMCP_IOEXPANDER -DUSE_STM32MP13XX_DK -DCORE_CA7 -DCACHE_USE -DMMU_USE -DUSE_HAL_DRIVER -DUSE_FULL_ASSERT
+CFLAGS  	+=  -O0 -ffunction-sections -Wall -Wno-strict-aliasing -fstack-usage -fcyclomatic-complexity -MMD -MP
 # CFLAGS  	+=  -MF"/home/nihao/work/github/STM32CubeMP13/Projects/STM32MP135C-DK/Examples/UART/UART_Receive_Transmit_Console/STM32CubeIDE/Debug/Drivers/STM32MP13xx_HAL_Driver/stm32mp13xx_hal.d" -MT"Drivers/STM32MP13xx_HAL_Driver/stm32mp13xx_hal.o" 
 CFLAGS  	+=  --specs=nano.specs -mfpu=vfpv4-d16 -mfloat-abi=hard -mthumb
 
 
 CXXFLAGS  	+=  -Wall
-LDFLAGS	    +=  -mcpu=cortex-a7 -T"Drivers/CMSIS/Device/ST/STM32MP13xx/Source/Templates/gcc/linker/stm32mp13xx_a7_ddr.ld" 
+LDFLAGS	    +=  -mcpu=cortex-a7 -T"Drivers/CMSIS/Device/ST/STM32MP13xx/Source/Templates/gcc/linker/stm32mp13xx_a7_sysram.ld" 
 LDFLAGS	    +=  --specs=nosys.specs -Wl,-Map="blink.map" 
 LDFLAGS	    +=  -Wl,--gc-sections -static --specs=nano.specs -mfpu=vfpv4-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 
