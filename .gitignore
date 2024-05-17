@@ -5,3 +5,5 @@
 UART_Receive_Transmit_Console_A7*
 toolchain/*
 toolchain.tar.gz
+blink*
+mini_sdraw*
