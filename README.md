@@ -6,7 +6,9 @@
 ## USE
 ```bash
 # 下载工具链
-wget -q -O - "https://github.com/dianjixz/stm32mp135_Bare_computer_project/releases/download/v0.0.1/toolchain.tar.gz" | tar -xzf - -C toolchain
+wget https://github.com/dianjixz/stm32mp135_Bare_computer_project/releases/download/v0.0.1/toolchain.tar.gz
+
+tar zxvf toolchain.tar.gz -C toolchain
 
 # 编译
 make 
