@@ -113,11 +113,6 @@ int main(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
-
-
-
-
-
   /* -1- Initialize LEDs mounted on STM32MP135C-DK board */
 //  BSP_LED_Init(LED_GREEN);
 
