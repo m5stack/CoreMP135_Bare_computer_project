@@ -3,32 +3,23 @@ CC   		:=  $(CROSS)gcc
 CXX   		:=  $(CROSS)g++
 DEBUG   	:=  
 # SOURCES   	+=  $(wildcard ./*.c)
-CSRCPATH	:= Projects/Src
+CSRCPATH	:= Projects/Src Drivers/BSP/Components/mcp23x17 Drivers/BSP/STM32MP13xx_DISCO
 CXXSRCPATH	?= 
+CSOURCES    += $(wildcard Drivers/STM32MP13xx_HAL_Driver/Src/stm32mp13xx_hal*.c)
 CSOURCES   	+= $(foreach dir, $(CSRCPATH), $(wildcard $(dir)/*.c))
 CXXSOURCES	+= $(foreach dir, $(CXXSRCPATH), $(wildcard $(dir)/*.cpp))
 CSOURCES   	+= Drivers/CMSIS/Device/ST/STM32MP13xx/Source/Templates/gcc/startup_stm32mp135c_ca7.c						\
-			Drivers/STM32MP13xx_HAL_Driver/Src/stm32mp13xx_hal.c													\
-			Drivers/STM32MP13xx_HAL_Driver/Src/stm32mp13xx_hal_dma.c												\
-			Drivers/STM32MP13xx_HAL_Driver/Src/stm32mp13xx_hal_dma_ex.c												\
-			Drivers/STM32MP13xx_HAL_Driver/Src/stm32mp13xx_hal_exti.c												\
-			Drivers/STM32MP13xx_HAL_Driver/Src/stm32mp13xx_hal_gpio.c												\
-			Drivers/STM32MP13xx_HAL_Driver/Src/stm32mp13xx_hal_i2c.c												\
-			Drivers/STM32MP13xx_HAL_Driver/Src/stm32mp13xx_hal_pwr.c												\
-			Drivers/STM32MP13xx_HAL_Driver/Src/stm32mp13xx_hal_pwr_ex.c												\
-			Drivers/STM32MP13xx_HAL_Driver/Src/stm32mp13xx_hal_rcc.c												\
-			Drivers/STM32MP13xx_HAL_Driver/Src/stm32mp13xx_hal_rcc_ex.c												\
 			Drivers/CMSIS/Core_A/Source/irq_ctrl_gic.c																\
 			Drivers/CMSIS/Device/ST/STM32MP13xx/Source/Templates/mmu_stm32mp13xx.c									\
-			Drivers/CMSIS/Device/ST/STM32MP13xx/Source/Templates/system_stm32mp13xx_A7.c							\
-			Drivers/BSP/STM32MP13xx_DISCO/stm32mp13xx_disco.c														\
-			Drivers/BSP/STM32MP13xx_DISCO/stm32mp13xx_disco_bus.c													\
-			Drivers/BSP/STM32MP13xx_DISCO/stm32mp13xx_disco_io.c													\
-			Drivers/BSP/STM32MP13xx_DISCO/stm32mp13xx_disco_stpmic1.c												\
-			Drivers/BSP/Components/mcp23x17/mcp23x17.c																\
-			Drivers/BSP/Components/mcp23x17/mcp23x17_reg.c															
+			Drivers/CMSIS/Device/ST/STM32MP13xx/Source/Templates/system_stm32mp13xx_A7.c
 			   
+CSOURCES_REMOVE += Drivers/STM32MP13xx_HAL_Driver/Src/stm32mp13xx_hal_msp_template.c \
+				   Drivers/BSP/STM32MP13xx_DISCO/stm32mp13xx_disco_sd.c   \
+				   Drivers/BSP/STM32MP13xx_DISCO/stm32mp13xx_disco_lcd.c   \
+				   Drivers/BSP/STM32MP13xx_DISCO/stm32mp13xx_disco_camera.c \
+				   Drivers/BSP/STM32MP13xx_DISCO/stm32mp13xx_disco_ts.c
 
+CSOURCES := $(filter-out $(CSOURCES_REMOVE), $(CSOURCES))
 
 INCLUDES   	+=   -IProjects/Src -IProjects/Inc  -IDrivers/CMSIS/Core_A/Include -IDrivers/CMSIS/Device/ST/STM32MP13xx/Include 
 INCLUDES   	+=   -IDrivers/STM32MP13xx_HAL_Driver/Inc -IDrivers/BSP/STM32MP13xx_DISCO -IDrivers/BSP/Components/Common
