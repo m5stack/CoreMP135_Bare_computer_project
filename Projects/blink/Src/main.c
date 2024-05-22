@@ -305,7 +305,7 @@ static void EXTI14_IRQHandler_Config(void)
   */
 static void Exti14FallingCb(void)
 {
-  BSP_LED_Toggle(LED_GREEN);
+  // BSP_LED_Toggle(LED_GREEN);
 }
 /* USER CODE END 4 */
 
