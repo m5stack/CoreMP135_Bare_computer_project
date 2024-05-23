@@ -52,9 +52,15 @@ LDFLAGS	    +=  -Wl,--gc-sections -static --specs=nano.specs -mfpu=vfpv4-d16 -mf
 # 	$(SDK_PATH)Utilities/ImageHeader/postbuild.sh $(shell pwd) $(CURRENT_DIR)_A7.bin $(CURRENT_DIR)_A7_Signed.bin "-bt 10" "-ep 2FFE0000"
 
 
-# mini_sdraw.bin: $(CURRENT_DIR).stm32
-# 	dd if=/dev/zero of=mini_sdraw.bin bs=1M count=1
-# 	dd if=$(CURRENT_DIR).stm32 of=mini_sdraw.bin bs=1K seek=64
+mini_sdraw.bin: $(CURRENT_DIR).stm32
+	dd if=/dev/zero of=mini_sdraw.bin bs=5M count=1
+	sgdisk -og -a 1 mini_sdraw.bin
+	sgdisk -a 1 -n 1:34:200 -c 1:fsbl1 -t 1:8301  mini_sdraw.bin
+	sgdisk -a 1 -n 2:201:367 -c 2:fsbl2 -t 2:8301  mini_sdraw.bin
+	sgdisk -a 1 -n 3:368: -c 3:fip -t 3:8301  mini_sdraw.bin
+	dd if=$(CURRENT_DIR).stm32 of=mini_sdraw.bin bs=512 seek=34 conv=notrunc
+	dd if=$(CURRENT_DIR).stm32 of=mini_sdraw.bin bs=512 seek=201 conv=notrunc
+#   dd if=app.bin of=mini_sdraw.bin bs=512 seek=368
 
 
 $(CURRENT_DIR).stm32:$(CURRENT_DIR).elf
@@ -84,8 +90,8 @@ CLEANOBJ   		+=  $(patsubst %.c, %.cc.su, $(CSOURCES))
 .PHONY:clean
 clean:
 	@echo "Remove linked and compiled files......"
-	rm -rf $(OBJ) $(TARGET) output 
-	rm -rf $(CLEANOBJ)
-	rm -rf $(CURRENT_DIR)*
-	rm -rf mini_sdraw.bin
+	@rm -rf $(OBJ) $(TARGET) output 
+	@rm -rf $(CLEANOBJ)
+	@rm -rf $(CURRENT_DIR)*
+	@rm -rf mini_sdraw.bin
 

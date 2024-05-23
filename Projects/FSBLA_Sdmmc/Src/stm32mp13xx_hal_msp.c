@@ -130,7 +130,7 @@ void HAL_SD_MspInit(SD_HandleTypeDef *hsd) {
     __HAL_RCC_SDMMC1_FORCE_RESET();
     /* Release the SDMMC Periheral Clock Reset */
     __HAL_RCC_SDMMC1_RELEASE_RESET();
-    LOG_PRINT("");
+
     /* Enable GPIOs clock */
     __HAL_RCC_GPIOA_CLK_ENABLE();
     __HAL_RCC_GPIOB_CLK_ENABLE();
@@ -140,7 +140,7 @@ void HAL_SD_MspInit(SD_HandleTypeDef *hsd) {
     __HAL_RCC_GPIOF_CLK_ENABLE();
     __HAL_RCC_GPIOG_CLK_ENABLE();
     __HAL_RCC_GPIOH_CLK_ENABLE();
-    LOG_PRINT("");
+
     /* Common GPIO configuration */
     GPIO_Init_Structure.Mode  = GPIO_MODE_AF_PP;
     GPIO_Init_Structure.Pull  = GPIO_NOPULL;
@@ -156,49 +156,40 @@ void HAL_SD_MspInit(SD_HandleTypeDef *hsd) {
     GPIO_Init_Structure.Pin =
         GPIO_PIN_8 | GPIO_PIN_9 | GPIO_PIN_10 | GPIO_PIN_11 | GPIO_PIN_12;
     HAL_GPIO_Init(GPIOC, &GPIO_Init_Structure);
-    LOG_PRINT("");
     /* CMD on PD2 - AF12 NOPULL*/
     GPIO_Init_Structure.Pull      = GPIO_NOPULL;
     GPIO_Init_Structure.Alternate = GPIO_AF12_SDIO1;
     GPIO_Init_Structure.Pin       = GPIO_PIN_2;
     HAL_GPIO_Init(GPIOD, &GPIO_Init_Structure);
-    LOG_PRINT("");
     /* CKIN on PB15 - AF8 NOPULL*/
     GPIO_Init_Structure.Pull      = GPIO_NOPULL;
     GPIO_Init_Structure.Alternate = GPIO_AF8_SDIO1;
     GPIO_Init_Structure.Pin       = GPIO_PIN_15;
     HAL_GPIO_Init(GPIOB, &GPIO_Init_Structure);
-    LOG_PRINT("");
     // /* D4 on PB14 - AF11 NOPULL*/
     // GPIO_Init_Structure.Pull      = GPIO_NOPULL;
     // GPIO_Init_Structure.Alternate = GPIO_AF11_SDIO1;
     // GPIO_Init_Structure.Pin       = GPIO_PIN_14;
     // HAL_GPIO_Init(GPIOB, &GPIO_Init_Structure);
-    // LOG_PRINT("");
     // /* D5 on PB12 - AF12 NOPULL*/
     // GPIO_Init_Structure.Pull      = GPIO_NOPULL;
     // GPIO_Init_Structure.Alternate = GPIO_AF12_SDIO1;
     // GPIO_Init_Structure.Pin       = GPIO_PIN_12;
     // HAL_GPIO_Init(GPIOB, &GPIO_Init_Structure);
-    // LOG_PRINT("");
     // /* D6 on PC6 - AF8 NOPULL*/
     // GPIO_Init_Structure.Pull      = GPIO_NOPULL;
     // GPIO_Init_Structure.Alternate = GPIO_AF8_SDIO1;
     // GPIO_Init_Structure.Pin       = GPIO_PIN_6;
     // HAL_GPIO_Init(GPIOC, &GPIO_Init_Structure);
-    // LOG_PRINT("");
     // /* D7 on PC7 - AF12 NOPULL*/
     // GPIO_Init_Structure.Pull      = GPIO_NOPULL;
     // GPIO_Init_Structure.Alternate = GPIO_AF10_SDIO1;
     // GPIO_Init_Structure.Pin       = GPIO_PIN_7;
     // HAL_GPIO_Init(GPIOC, &GPIO_Init_Structure);
-    // LOG_PRINT("");
 
     /* Enable configuration for SDMMC interrupts */
     IRQ_SetPriority(SDMMC1_IRQn, 0x00);
-    LOG_PRINT("");
     IRQ_Enable(SDMMC1_IRQn);
-    LOG_PRINT("");
 }
 
 /* USER CODE BEGIN 1 */

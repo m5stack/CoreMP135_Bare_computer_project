@@ -1,11 +1,13 @@
+BUILDTYPE ?= sysram
+
+
+
 SDK_PATH	:= ../../
 CURRENT_DIR := $(shell basename $(CURDIR))
 CROSS 		:= $(SDK_PATH)toolchain/bin/arm-none-eabi-
 CC   		:=  $(CROSS)gcc
 CXX   		:=  $(CROSS)g++
 DEBUG   	:=  
-
-BUILDTYPE   = sysram # sysram or ddr
 
 # SOURCES   	+=  $(wildcard ./*.c)
 CSRCPATH	:= Src $(SDK_PATH)Drivers/BSP/Components/mcp23x17 $(SDK_PATH)Drivers/BSP/STM32MP13xx_DISCO
@@ -49,20 +51,18 @@ LDFLAGS	    +=  -Wl,--gc-sections -static --specs=nano.specs -mfpu=vfpv4-d16 -mf
 
 ifeq ($(BUILDTYPE), sysram)
 LDFLAGS	    +=  -T"$(SDK_PATH)Drivers/CMSIS/Device/ST/STM32MP13xx/Source/Templates/gcc/linker/stm32mp13xx_a7_sysram.ld" 
-
+all:sysram_bin
+	@echo "BUILDTYPE is sysram"
 else
-
 LDFLAGS	    +=  -T"$(SDK_PATH)Drivers/CMSIS/Device/ST/STM32MP13xx/Source/Templates/gcc/linker/stm32mp13xx_a7_ddr.ld" 
 CFLAGS  	+=  -DUSE_DDR
-
-# mini_sdraw.bin: $(CURRENT_DIR).stm32
-# 	dd if=/dev/zero of=mini_sdraw.bin bs=1K count=65
-# 	dd if=$(CURRENT_DIR).stm32 of=mini_sdraw.bin bs=1K seek=64
-
+all:ddr_bin
+	@echo "BUILDTYPE is ddr"
 endif
 
 
-sysram: $(CURRENT_DIR).stm32
+
+sysram_bin: $(CURRENT_DIR).stm32
 	dd if=/dev/zero of=mini_sdraw.bin bs=1M count=1
 	dd if=$(CURRENT_DIR).stm32 of=mini_sdraw.bin bs=1K seek=64
 
@@ -72,9 +72,13 @@ $(CURRENT_DIR).stm32:$(CURRENT_DIR).elf
 	$(SDK_PATH)Utilities/ImageHeader/postbuild_STM32MP13.sh $(SDK_PATH)toolchain/bin $(CURRENT_DIR)
 
 
-ddr:$(CURRENT_DIR).elf
-	$(CROSS)size  $(CURRENT_DIR).elf 
-	$(CROSS)objcopy -O binary $(CURRENT_DIR).elf $(CURRENT_DIR).bin
+ddr_bin:$(CURRENT_DIR).elf
+	mv $(CURRENT_DIR).elf tmp_$(CURRENT_DIR).elf
+	make clean
+	cd ../FSBLA_Sdmmc ;make -j ;cp mini_sdraw.bin ../blink ;make clean
+	$(CROSS)size  tmp_$(CURRENT_DIR).elf
+	$(CROSS)objcopy -O binary tmp_$(CURRENT_DIR).elf $(CURRENT_DIR).bin
+	dd if=$(CURRENT_DIR).bin of=mini_sdraw.bin bs=512 seek=368 conv=notrunc
 
 #links
 $(CURRENT_DIR).elf:$(OBJ)
@@ -97,8 +101,8 @@ CLEANOBJ   		+=  $(patsubst %.c, %.cc.su, $(CSOURCES))
 .PHONY:clean 
 clean:
 	@echo "Remove linked and compiled files......"
-	rm -rf $(OBJ) $(TARGET) output 
-	rm -rf $(CLEANOBJ)
-	rm -rf $(CURRENT_DIR)*
-	rm -rf mini_sdraw.bin
+	@rm -rf $(OBJ) $(TARGET) output 
+	@rm -rf $(CLEANOBJ)
+	@rm -rf $(CURRENT_DIR)*
+	@rm -rf mini_sdraw.bin
 

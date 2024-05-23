@@ -22,10 +22,12 @@
 
 #include <stdio.h>
 #include <string.h>
+
+#include "gpt_table.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
-int Debug_s = 0;
+int Debug_s = 1;
 
 /* USER CODE END Includes */
 
@@ -239,7 +241,8 @@ int main(void) {
     SDHandle.Init.ClockPowerSave      = SDMMC_CLOCK_POWER_SAVE_DISABLE;
     SDHandle.Init.BusWide             = SDMMC_BUS_WIDE_4B;
     SDHandle.Init.HardwareFlowControl = SDMMC_HARDWARE_FLOW_CONTROL_DISABLE;
-    SDHandle.Init.ClockDiv            = SDMMC_NSPEED_CLK_DIV;
+    // SDHandle.Init.ClockDiv            = SDMMC_NSPEED_CLK_DIV;   // 0x10
+    SDHandle.Init.ClockDiv            = 0x08;
 
     if (HAL_SD_Init(&SDHandle) != HAL_OK) {
         Error_Handler();
@@ -271,11 +274,40 @@ int main(void) {
         Error_Handler();
     }
 #else  /* GPT_TABLE_PRESENT */
-    exampleOffset = OFFSET_HEADER;
-    if (HAL_SD_ReadBlocks(&SDHandle, (uint8_t *)DDR_MEM_ADD, 368, 3220,
-                          30000) != HAL_OK) {
+    exampleOffset = 0;
+    if (HAL_SD_ReadBlocks(&SDHandle, (uint8_t *)DDR_MEM_ADD, 0, 32, 30000) !=
+        HAL_OK) {
         Error_Handler();
     }
+    gpt_header_t *gpt_header = DDR_MEM_ADD + SECTOR_SIZE;
+    gpt_partition_entry_t *partition_entries =
+        gpt_header->partition_entry_lba * SECTOR_SIZE + DDR_MEM_ADD;
+
+    // Verify GPT signature
+    if (gpt_header->signature != GPT_SIGNATURE) {
+        LOG_PRINT("Invalid GPT signature");
+    } else {
+        LOG_PRINT("find GPT TABLE");
+        // Print partition information
+        for (uint32_t i = 0; i < gpt_header->num_partition_entries; ++i) {
+            if (partition_entries[i].starting_lba == 0 &&
+                partition_entries[i].ending_lba == 0) {
+                continue;  // Skip empty entries
+            }
+
+            if (partition_entries[i].partition_name[0] == 'f' &&
+                partition_entries[i].partition_name[1] == 'i' &&
+                partition_entries[i].partition_name[2] == 'p') {
+                exampleOffset      = partition_entries[i].starting_lba;
+                nbCubeExampleBlock = partition_entries[i].ending_lba -
+                                     partition_entries[i].starting_lba + 1;
+                LOG_PRINT("find app Partition start :%lu  len :%lu",
+                          exampleOffset, nbCubeExampleBlock);
+            }
+        }
+    }
+
+    LOG_PRINT("Read GPT Table over!");
 #endif /* GPT_TABLE_PRESENT */
 
     // /*##- Read CubeExampleHeader ####################*/
@@ -313,19 +345,27 @@ int main(void) {
 
     // nbCubeExampleBlock = sizeCubeExample / BLOCKSIZE;
 
-    // /*##- Load application into DDR ####################*/
-    // LOG_PRINT("Read application from the SD");
-    // /* Read application from the SD */
-    // RxCplt = 0;
-    // if (HAL_SD_ReadBlocks_DMA(&SDHandle, (uint8_t *)DDR_MEM_ADD,
-    //                           (exampleOffset + NB_BLOCK_HEADER),
-    //                           nbCubeExampleBlock + 1) != HAL_OK) {
+    /*##- Load application into DDR ####################*/
+    if (exampleOffset == 0) {
+        exampleOffset      = 368;
+        nbCubeExampleBlock = 3220;
+    }
+    LOG_PRINT("Read application from the SD");
+    /* Read application from the SD */
+    RxCplt = 0;
+    if (HAL_SD_ReadBlocks_DMA(&SDHandle, (uint8_t *)DDR_MEM_ADD,
+    exampleOffset,
+                              nbCubeExampleBlock) != HAL_OK) {
+        Error_Handler();
+    }
+    LOG_PRINT("Wait RxCplt == 0");
+    /* Wait until Application if loaded into DDR from SD storage */
+    while (RxCplt == 0) {
+    };
+    // if (HAL_SD_ReadBlocks(&SDHandle, (uint8_t *)DDR_MEM_ADD, exampleOffset,
+    //                       nbCubeExampleBlock, 30000) != HAL_OK) {
     //     Error_Handler();
     // }
-    // LOG_PRINT("Wait RxCplt == 0");
-    // /* Wait until Application if loaded into DDR from SD storage */
-    // while (RxCplt == 0) {
-    // };
 
     /* LED_BLUE OFF */
     // BSP_LED_Off(LED_BLUE);
