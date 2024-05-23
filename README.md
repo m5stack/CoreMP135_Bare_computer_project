@@ -1,18 +1,21 @@
 # stm32mp135_Bare_computer_project
-这是一个 stm32mp135 的裸机工程，烧录到 sd 卡中后，启动设备 ，PC13 引脚会闪烁。
+This is a simple bare-metal project for the STM32MP135. After being flashed to an SD card and booting the device, the PC13 pin will blink.
 
-请在 linux 下食用。
+Please compile under Linux.
 
 ## USE
 ```bash
-# 下载工具链
+# Download toolchain.
 wget https://github.com/dianjixz/stm32mp135_Bare_computer_project/releases/download/v0.0.1/toolchain.tar.gz
 
 tar zxvf toolchain.tar.gz -C toolchain
 
-# 编译
+# Install the toolkit.
+sudo apt install sgdisk make 
+
+# Compile.
 make 
 
-# 清理编译文件
+# Clean up compiled files.
 make clean
 ```

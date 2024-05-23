@@ -1,7 +1,4 @@
 BUILDTYPE ?= sysram
-
-
-
 SDK_PATH	:= ../../
 CURRENT_DIR := $(shell basename $(CURDIR))
 CROSS 		:= $(SDK_PATH)toolchain/bin/arm-none-eabi-
