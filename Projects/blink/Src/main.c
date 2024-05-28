@@ -15,6 +15,7 @@
   * in the root directory of this software component.
   * If no LICENSE file comes with this software, it is provided AS-IS.
   *
+  * Copyright (c) 2024 M5Stack Technology CO LTD
   ******************************************************************************
   */
 /* USER CODE END Header */
